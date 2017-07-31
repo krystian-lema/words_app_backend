@@ -8,6 +8,8 @@ class ActiveSupport::TestCase
 
   def login_as_user
     user = users(:one)
-  	post '/login', :params => { :username => user.username, :password => "password" }
+    post '/login', params: { username: user.username, password: 'password' }
+    json_response = ActiveSupport::JSON.decode @response.body
+    json_response['auth_token']
   end
 end
