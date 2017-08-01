@@ -2,6 +2,8 @@ class User < ApplicationRecord
   has_secure_password
   has_secure_token :auth_token
 
+  has_many :word_collection
+
   validates :username, presence: true, uniqueness: true
   validates :email, presence: true
   validates :password, presence: true, length: { minimum: 8 }, on: :create

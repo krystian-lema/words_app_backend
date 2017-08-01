@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
-  before_action :authenticate, except: :create
-
+  before_action :authorize, except: :create
+  
   def create
     @user = User.new(user_create_params)
     if @user.save
@@ -25,47 +25,19 @@ class UsersController < ApplicationController
   end
 
   def update_user(params)
-    if @user.present?
-      if @user.update(params)
-        render json: { success: true, user: @user, auth_token: updated_auth_token }
-      else
-        render json: { success: false, error: @user.errors.full_messages.first }
-      end
+    if current_user.update(params)
+      render json: { success: true, user: current_user, auth_token: updated_auth_token }
     else
-      render_auth_problem
+      render json: { success: false, error: current_user.errors.full_messages.first, auth_token: updated_auth_token }
     end
   end
 
   def destroy
-    if @user.present?
-      @user.destroy
-      render json: { success: true }
-    else
-      render_auth_problem
-    end
+    current_user.destroy
+    render json: { success: true }
   end
 
   private
-
-  def authenticate
-    token = params['auth_token']
-    if token.present?
-      @user = if User.where(auth_token: token).blank?
-                nil
-              else
-                User.find_by(auth_token: token)
-              end
-    end
-  end
-
-  def render_auth_problem
-    render json: { success: false, error: 'Bad credendials' }, status: 401
-  end
-
-  def updated_auth_token
-    @user.regenerate_auth_token
-    @user.auth_token
-  end
 
   def user_create_params
     params.require(:user).permit(:username, :email, :password, :password_confirmation)
@@ -82,12 +54,5 @@ class UsersController < ApplicationController
   def user_change_password_params
     params.require(:user).permit(:password, :password_confirmation)
   end
-
-  def get_parsed_body
-    request.body.rewind
-    request_body = request.body.read
-    request_body = '{}' if request_body.empty?
-    parsed_body = JSON.parse(request_body)
-    parsed_body
-  end
+  
 end

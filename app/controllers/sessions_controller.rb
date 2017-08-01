@@ -10,7 +10,6 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    session[:user_id] = nil
     user.auth_token = nil
     render json: { success: true }
   end
