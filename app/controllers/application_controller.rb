@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
 
   def current_user
     token = params['auth_token']
-    @current_user ||= User.find_by(auth_token: token) if User.where(auth_token: token).present? if token.present?
+    @current_user ||= User.find_by(auth_token: token) if token.present? && User.where(auth_token: token).present?
   end
   helper_method :current_user
 
@@ -19,5 +19,4 @@ class ApplicationController < ActionController::Base
     current_user.regenerate_auth_token if current_user
     current_user.auth_token if current_user
   end
-
 end

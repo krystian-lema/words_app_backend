@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_action :authorize, except: :create
-  
+
   def create
     @user = User.new(user_create_params)
     if @user.save
@@ -54,5 +54,4 @@ class UsersController < ApplicationController
   def user_change_password_params
     params.require(:user).permit(:password, :password_confirmation)
   end
-  
 end

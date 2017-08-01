@@ -1,0 +1,21 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  definition: definition1
+  translation: translation1
+  word_collection: one
+
+two:
+  definition: definition2
+  translation: translation2
+  word_collection: two
+
+three:
+  definition: definition3
+  translation: translation3
+  word_collection: three
+
+four:
+  definition: definition4
+  translation: translation4
+  word_collection: three
