@@ -5,12 +5,12 @@ class WordCollectionsController < ApplicationController
 
   def get_public_collections
     @collections = WordCollection.all.where(public: true)
-    render json: { success: true, word_collections: @collections, auth_token: updated_auth_token }
+    render json: { success: true, data: { word_collections: @collections }, auth_token: updated_auth_token }
   end
 
   def get_collections
     @collections = WordCollection.all.where(user_id: current_user.id)
-    render json: { success: true, word_collections: @collections, auth_token: updated_auth_token }
+    render json: { success: true, data: { word_collections: @collections }, auth_token: updated_auth_token }
   end
 
   def create_collection
@@ -18,7 +18,7 @@ class WordCollectionsController < ApplicationController
     collection.user = current_user
     collection.public = false
     if collection.save
-      render json: { success: true, word_collection: collection, auth_token: updated_auth_token }
+      render json: { success: true, data: { word_collection: collection }, auth_token: updated_auth_token }
     else
       render json: { success: false, error: collection.errors.full_messages.first, auth_token: updated_auth_token }
     end
@@ -26,7 +26,7 @@ class WordCollectionsController < ApplicationController
 
   def change_collection_name
     if @collection.update(change_collection_name_params)
-      render json: { success: true, word_collection: @collection, auth_token: updated_auth_token }
+      render json: { success: true, data: { word_collection: @collection }, auth_token: updated_auth_token }
     else
       render json: { success: false, error: @collection.errors.full_messages.first, auth_token: updated_auth_token }
     end

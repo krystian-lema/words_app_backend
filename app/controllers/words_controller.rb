@@ -8,7 +8,7 @@ class WordsController < ApplicationController
     if @collection.present?
       if check_collection_permission(@collection)
         @words = @collection.word.all.order('created_at')
-        render json: { success: true, words: @words, auth_token: updated_auth_token }
+        render json: { success: true, data: { words: @words }, auth_token: updated_auth_token }
       end
     else
       render json: { success: false, error: 'Collection with id ' + params['id'] + ' not found', auth_token: updated_auth_token }
@@ -20,7 +20,7 @@ class WordsController < ApplicationController
     if @collection.present?
       word.word_collection = @collection
       if word.save
-        render json: { success: true, word: word, auth_token: updated_auth_token }
+        render json: { success: true, data: { word: word }, auth_token: updated_auth_token }
       else
         render json: { success: false, error: word.errors.full_messages.first, auth_token: updated_auth_token }
       end
@@ -31,7 +31,7 @@ class WordsController < ApplicationController
 
   def edit_word
     if @word.update(edit_word_params)
-      render json: { success: true, word: @word, auth_token: updated_auth_token }
+      render json: { success: true, data: { word: @word }, auth_token: updated_auth_token }
     else
       render json: { success: false, error: @word.errors.full_messages.first, auth_token: updated_auth_token }
     end

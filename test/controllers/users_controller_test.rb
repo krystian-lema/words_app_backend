@@ -8,8 +8,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
   test 'create new user' do
     assert_difference('User.count', 1, 'User should be created') do
-      post '/users', params: { user: { username: 'newuser', email: 'newuser@email.com',
-                                       password: 'password', password_confirmation: 'password' } }
+      post '/users', params: { username: 'newuser', email: 'newuser@email.com',
+                               password: 'password', password_confirmation: 'password' }
     end
 
     json_response = ActiveSupport::JSON.decode @response.body
@@ -18,8 +18,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
   test 'try to create user passing two different passwords' do
     assert_no_difference('User.count', 'User should not be created.') do
-      post '/users', params: { user: { username: 'newuser', email: 'newuser@email.com',
-                                       password: 'password', password_confirmation: 'badpassword' } }
+      post '/users', params: { username: 'newuser', email: 'newuser@email.com',
+                               password: 'password', password_confirmation: 'badpassword' }
     end
 
     json_response = ActiveSupport::JSON.decode @response.body
@@ -29,8 +29,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
   test 'try to create user passing too short password' do
     assert_no_difference('User.count', 'User should not be created.') do
-      post '/users', params: { user: { username: 'newuser', email: 'newuser@email.com',
-                                       password: 'pass', password_confirmation: 'pass' } }
+      post '/users', params: { username: 'newuser', email: 'newuser@email.com',
+                               password: 'pass', password_confirmation: 'pass' }
     end
 
     json_response = ActiveSupport::JSON.decode @response.body
@@ -40,13 +40,13 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
   test 'try to create user with existing username' do
     assert_difference('User.count', 1, 'User should be created') do
-      post '/users', params: { user: { username: 'newuser', email: 'newuser@email.com',
-                                       password: 'password', password_confirmation: 'password' } }
+      post '/users', params: { username: 'newuser', email: 'newuser@email.com',
+                               password: 'password', password_confirmation: 'password' }
     end
 
     assert_no_difference('User.count', 'User should not be created.') do
-      post '/users', params: { user: { username: 'newuser', email: 'newuser@email.com',
-                                       password: 'password', password_confirmation: 'password' } }
+      post '/users', params: { username: 'newuser', email: 'newuser@email.com',
+                               password: 'password', password_confirmation: 'password' }
     end
 
     json_response = ActiveSupport::JSON.decode @response.body
@@ -72,7 +72,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     token = login_as_user
     old_username = @user.username
     new_username = 'updated'
-    patch '/change_username', params: { user: { username: new_username }, auth_token: token }
+    patch '/change_username', params: { username: new_username, auth_token: token }
 
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal true, json_response['success'], json_response['error']
@@ -83,7 +83,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     token = login_as_user
     old_username = @user.username
     new_username = 'updated'
-    patch '/change_username', params: { user: { username: new_username } }
+    patch '/change_username', params: { username: new_username }
 
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal false, json_response['success'], json_response['error']
@@ -94,7 +94,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     token = login_as_user
     old_email = @user.email
     new_email = 'updated@email.com'
-    patch '/change_email', params: { user: { email: new_email }, auth_token: token }
+    patch '/change_email', params: { email: new_email, auth_token: token }
 
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal true, json_response['success'], json_response['error']
@@ -105,7 +105,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     token = login_as_user
     old_email = @user.email
     new_email = 'updated@email.com'
-    patch '/change_email', params: { user: { email: new_email } }
+    patch '/change_email', params: { email: new_email }
 
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal false, json_response['success'], json_response['error']
@@ -116,7 +116,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     token = login_as_user
     old_password = @user.password_digest
     new_password = 'new123pass'
-    patch '/change_password', params: { user: { password: new_password, password_confirmation: new_password }, auth_token: token }
+    patch '/change_password', params: { password: new_password, password_confirmation: new_password, auth_token: token }
 
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal true, json_response['success'], json_response['error']
@@ -127,7 +127,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     token = login_as_user
     old_password = @user.password_digest
     new_password = 'new123pass'
-    patch '/change_password', params: { user: { password: new_password, password_confirmation: new_password } }
+    patch '/change_password', params: { password: new_password, password_confirmation: new_password }
 
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal false, json_response['success'], json_response['error']

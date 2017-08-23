@@ -16,4 +16,8 @@ class User < ApplicationRecord
     validate_password == 'true' || validate_password == true
   end
   attr_accessor :validate_password
+
+  def as_json(_options = {})
+    super(only: %i[username email])
+  end
 end

@@ -16,7 +16,12 @@ class ApplicationController < ActionController::Base
   end
 
   def updated_auth_token
-    current_user.regenerate_auth_token if current_user
-    current_user.auth_token if current_user
+    user = current_user
+    if user.present?
+      user.regenerate_auth_token
+      user.auth_token
+    else  
+      nil
+    end
   end
 end
