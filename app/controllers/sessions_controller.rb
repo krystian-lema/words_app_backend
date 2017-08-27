@@ -5,9 +5,12 @@ class SessionsController < ApplicationController
     user = User.find_by_username(params[:username])
     if user && user.authenticate(params[:password])
       user.regenerate_auth_token
-      render json: { success: true, data: { user: user }, auth_token: user.auth_token }
+      response.headers['auth-token'] = user.auth_token
+      render json: { success: true, data:  user }
+      # render_response(true, nil, { user: user })
     else
-      render json: { success: false, error: 'Invalid username or password' }
+      # render json: { success: false, error: 'Invalid username or password' }
+      render_response(false, 'Invalid username or password', nil)
     end
   end
 

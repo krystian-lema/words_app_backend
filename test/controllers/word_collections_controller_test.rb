@@ -11,7 +11,7 @@ class WordCollectionsControllerTest < ActionDispatch::IntegrationTest
 
   test 'get public collections' do
     token = login_as_user
-    get '/public_collections', params: { auth_token: token }
+    get '/public_collections', headers: { 'auth-token' => token }
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal true, json_response['success'], json_response['error']
   end
@@ -24,7 +24,7 @@ class WordCollectionsControllerTest < ActionDispatch::IntegrationTest
 
   test 'get collections' do
     token = login_as_user
-    get '/collections', params: { auth_token: token }
+    get '/collections', headers: { 'auth-token' => token }
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal true, json_response['success'], json_response['error']
   end
@@ -39,7 +39,7 @@ class WordCollectionsControllerTest < ActionDispatch::IntegrationTest
     token = login_as_user
     collection_name = 'Base Collection'
     assert_difference('WordCollection.count', 1, 'Collection should be created') do
-      post '/collections', params: { word_collection: { name: collection_name }, auth_token: token }
+      post '/collections', params: { name: collection_name }, headers: { 'auth-token' => token }
     end
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal true, json_response['success'], json_response['error']
@@ -52,7 +52,7 @@ class WordCollectionsControllerTest < ActionDispatch::IntegrationTest
     token = login_as_user
     collection_name = 'Base Collection'
     assert_difference('@user.word_collection.count', 1, 'Collection should be created') do
-      post '/collections', params: { word_collection: { name: collection_name }, auth_token: token }
+      post '/collections', params: { name: collection_name }, headers: { 'auth-token' => token }
     end
     assert_equal collection_name, @user.word_collection.last.name
     assert_equal false, @user.word_collection.last.public
@@ -61,7 +61,7 @@ class WordCollectionsControllerTest < ActionDispatch::IntegrationTest
   test 'should not create collection when is not logged in' do
     collection_name = 'Base Collection'
     assert_no_difference('WordCollection.count', 'Collection should not be created') do
-      post '/collections', params: { word_collection: { name: collection_name } }
+      post '/collections', params: { name: collection_name }
     end
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal false, json_response['success'], json_response['error']
@@ -70,7 +70,7 @@ class WordCollectionsControllerTest < ActionDispatch::IntegrationTest
   test 'change name of the collection' do
     token = login_as_user
     new_name = 'updated'
-    patch '/collections/' + @my_collection.id.to_s, params: { word_collection: { name: new_name }, auth_token: token }
+    patch '/collections/' + @my_collection.id.to_s, params: { name: new_name }, headers: { 'auth-token' => token }
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal true, json_response['success'], json_response['error']
     assert_equal new_name, @my_collection.reload.name
@@ -79,7 +79,7 @@ class WordCollectionsControllerTest < ActionDispatch::IntegrationTest
   test 'should not change name of the collection when belongs to other user' do
     token = login_as_user
     new_name = 'updated'
-    patch '/collections/' + @not_my_collection.id.to_s, params: { word_collection: { name: new_name }, auth_token: token }
+    patch '/collections/' + @not_my_collection.id.to_s, params: { name: new_name }, headers: { 'auth-token' => token }
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal false, json_response['success'], json_response['error']
     assert_not_equal new_name, @not_my_collection.reload.name
@@ -87,7 +87,7 @@ class WordCollectionsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should not change name of the collection when is not logged in' do
     new_name = 'updated'
-    patch '/collections/' + @my_collection.id.to_s, params: { word_collection: { name: new_name } }
+    patch '/collections/' + @my_collection.id.to_s, params: { name: new_name }
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal false, json_response['success'], json_response['error']
     assert_not_equal new_name, @my_collection.reload.name
@@ -96,7 +96,7 @@ class WordCollectionsControllerTest < ActionDispatch::IntegrationTest
   test 'delete collection' do
     token = login_as_user
     assert_difference('WordCollection.count', -1, 'Collection should be deleted') do
-      delete '/collections/' + @my_collection.id.to_s, params: { auth_token: token }
+      delete '/collections/' + @my_collection.id.to_s, headers: { 'auth-token' => token }
     end
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal true, json_response['success'], json_response['error']
@@ -105,7 +105,7 @@ class WordCollectionsControllerTest < ActionDispatch::IntegrationTest
   test 'should not delete collection when belongs to other user' do
     token = login_as_user
     assert_no_difference('WordCollection.count', 'Collection should not be deleted') do
-      delete '/collections/' + @not_my_collection.id.to_s, params: { auth_token: token }
+      delete '/collections/' + @not_my_collection.id.to_s, headers: { 'auth-token' => token }
     end
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal false, json_response['success'], json_response['error']
@@ -122,7 +122,7 @@ class WordCollectionsControllerTest < ActionDispatch::IntegrationTest
   test 'try to change name of the collection that is not exist' do
     token = login_as_user
     new_name = 'updated'
-    patch '/collections/1', params: { word_collection: { name: new_name }, auth_token: token }
+    patch '/collections/1', params: { name: new_name }, headers: { 'auth-token' => token }
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal false, json_response['success'], json_response['error']
   end
@@ -130,7 +130,7 @@ class WordCollectionsControllerTest < ActionDispatch::IntegrationTest
   test 'try to delete the collection that is not exist' do
     token = login_as_user
     assert_no_difference('WordCollection.count', 'Collection should not be deleted') do
-      delete '/collections/1', params: { auth_token: token }
+      delete '/collections/1', headers: { 'auth-token' => token }
     end
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal false, json_response['success'], json_response['error']

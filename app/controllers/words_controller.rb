@@ -8,10 +8,10 @@ class WordsController < ApplicationController
     if @collection.present?
       if check_collection_permission(@collection)
         @words = @collection.word.all.order('created_at')
-        render json: { success: true, data: { words: @words }, auth_token: updated_auth_token }
+        render_response(true, nil, { words: @words })
       end
     else
-      render json: { success: false, error: 'Collection with id ' + params['id'] + ' not found', auth_token: updated_auth_token }
+      render_response(false, 'Collection with id ' + params['id'] + ' not found', nil)
     end
   end
 
@@ -20,28 +20,28 @@ class WordsController < ApplicationController
     if @collection.present?
       word.word_collection = @collection
       if word.save
-        render json: { success: true, data: { word: word }, auth_token: updated_auth_token }
+        render_response(true, nil, { word: word })
       else
-        render json: { success: false, error: word.errors.full_messages.first, auth_token: updated_auth_token }
+        render_response(false, word.errors.full_messages.first, nil)
       end
     else
-      render json: { success: false, error: 'Collection with id ' + params['id'] + ' not found', auth_token: updated_auth_token }
+      render_response(false, 'Collection with id ' + params['id'] + ' not found', nil)
     end
   end
 
   def edit_word
     if @word.update(edit_word_params)
-      render json: { success: true, data: { word: @word }, auth_token: updated_auth_token }
+      render_response(true, nil, { word: @word })
     else
-      render json: { success: false, error: @word.errors.full_messages.first, auth_token: updated_auth_token }
+      render_response(false, @word.errors.full_messages.first, nil)
     end
   end
 
   def delete_word
     if @word.destroy
-      render json: { success: true, auth_token: updated_auth_token }
+      render_response(true, nil, nil)
     else
-      render json: { success: false, error: @word.errors.full_messages.first, auth_token: updated_auth_token }
+      render_response(false, @word.errors.full_messages.first, nil)
     end
   end
 
@@ -49,24 +49,24 @@ class WordsController < ApplicationController
 
   def find_collection
     @collection = WordCollection.find(params[:id]) if WordCollection.where(id: params[:id]).present?
-    render json: { success: false, error: 'Colllection does not exist', auth_token: updated_auth_token } if @collection.blank?
+    render_response(false, 'Colllection does not exist', nil) if @collection.blank?
   end
 
   def find_word
     @word = Word.find(params[:id]) if Word.where(id: params[:id]).present?
-    render json: { success: false, error: 'Word does not exist', auth_token: updated_auth_token } if @word.blank?
+    render_response(false, 'Word does not exist', nil) if @word.blank?
   end
 
   def check_collection_permission(collection)
     condition = collection.public
     condition ||= collection.user.id == current_user.id
-    render json: { success: false, error: 'Permission denied', auth_token: updated_auth_token } unless condition
+    render_response(false, 'Permission denied', nil) unless condition
     condition
   end
 
   def check_word_permission
     condition = @word.word_collection.user.id == current_user.id if @word.present?
-    render json: { success: false, error: 'Permission denied', auth_token: updated_auth_token } unless condition
+    render_response(false, 'Permission denied', nil) unless condition
   end
 
   def create_word_params

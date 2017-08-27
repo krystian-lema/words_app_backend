@@ -2,8 +2,9 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
   def current_user
-    token = params['auth_token']
+    token = request.headers['auth-token']
     @current_user ||= User.find_by(auth_token: token) if token.present? && User.where(auth_token: token).present?
+    # @current_user ||= User.find_by(auth_token: token)
   end
   helper_method :current_user
 
@@ -20,8 +21,11 @@ class ApplicationController < ActionController::Base
     if user.present?
       user.regenerate_auth_token
       user.auth_token
-    else  
-      nil
     end
+  end
+
+  def render_response(success_value, error_message, data_value)
+    response.headers['auth-token'] = updated_auth_token if success_value
+    render json: { success: success_value, error: error_message, data: data_value }
   end
 end

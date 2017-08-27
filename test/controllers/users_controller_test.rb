@@ -58,7 +58,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     post '/login', params: { username: @user.username, password: 'password' }
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal true, json_response['success'], json_response['error']
-    assert_equal json_response['auth_token'], @user.reload.auth_token
+    assert_equal @response.headers['auth-token'], @user.reload.auth_token
   end
 
   test 'should not login' do
@@ -72,7 +72,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     token = login_as_user
     old_username = @user.username
     new_username = 'updated'
-    patch '/change_username', params: { username: new_username, auth_token: token }
+    patch '/change_username', params: { username: new_username }, headers: { 'auth-token' => token }
 
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal true, json_response['success'], json_response['error']
@@ -94,7 +94,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     token = login_as_user
     old_email = @user.email
     new_email = 'updated@email.com'
-    patch '/change_email', params: { email: new_email, auth_token: token }
+    patch '/change_email', params: { email: new_email }, headers: { 'auth-token' => token }
 
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal true, json_response['success'], json_response['error']
@@ -116,7 +116,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     token = login_as_user
     old_password = @user.password_digest
     new_password = 'new123pass'
-    patch '/change_password', params: { password: new_password, password_confirmation: new_password, auth_token: token }
+    patch '/change_password', params: { password: new_password, password_confirmation: new_password }, headers: { 'auth-token' => token }
 
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal true, json_response['success'], json_response['error']
@@ -137,7 +137,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
   test 'delete user' do
     token = login_as_user
     assert_difference('User.count', -1, 'User should be deleted') do
-      delete '/users', params: { auth_token: token }
+      delete '/users', headers: { 'auth-token' => token }
     end
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal true, json_response['success']

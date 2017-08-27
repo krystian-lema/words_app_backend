@@ -13,14 +13,14 @@ class WordsControllerTest < ActionDispatch::IntegrationTest
 
   test 'get words from public collection' do
     token = login_as_user
-    get '/collections/' + @public_collection.id.to_s + '/words', params: { auth_token: token }
+    get '/collections/' + @public_collection.id.to_s + '/words', headers: { 'auth-token' => token }
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal true, json_response['success'], json_response['error']
   end
 
   test 'get words from user collection' do
     token = login_as_user
-    get '/collections/' + @my_collection.id.to_s + '/words', params: { auth_token: token }
+    get '/collections/' + @my_collection.id.to_s + '/words', headers: { 'auth-token' => token }
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal true, json_response['success'], json_response['error']
   end
@@ -34,16 +34,17 @@ class WordsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should not get words from collection when colelction not belongs to the user' do
     token = login_as_user
-    get '/collections/' + @not_my_collection.id.to_s + '/words', params: { auth_token: token }
+    get '/collections/' + @not_my_collection.id.to_s + '/words', headers: { 'auth-token' => token }
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal false, json_response['success'], json_response['error']
   end
 
   test 'create word' do
     token = login_as_user
+    @request.headers['auth_token'] = token
     assert_difference('@my_collection.word.count', 1, 'Word should be created') do
       post '/collections/' + @my_collection.id.to_s + '/words', params: { word: { definition: 'def',
-                                                                                  translation: 'trans' }, auth_token: token }
+                                                                                  translation: 'trans' } }, headers: { 'auth-token' => token }
     end
   end
 
@@ -62,7 +63,7 @@ class WordsControllerTest < ActionDispatch::IntegrationTest
     new_definition = 'updated'
     new_translation = 'updated'
     patch '/words/' + @my_word.id.to_s, params: { word: { definition: new_definition,
-                                                          translation: new_translation }, auth_token: token }
+                                                          translation: new_translation } }, headers: { 'auth-token' => token }
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal true, json_response['success'], json_response['error']
     assert_equal new_definition, @my_word.reload.definition
@@ -90,7 +91,7 @@ class WordsControllerTest < ActionDispatch::IntegrationTest
     new_definition = 'updated'
     new_translation = 'updated'
     patch '/words/' + @not_my_word.id.to_s, params: { word: { definition: new_definition,
-                                                              translation: new_translation }, auth_token: token }
+                                                              translation: new_translation } }, headers: { 'auth-token' => token }
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal false, json_response['success'], json_response['error']
     assert_equal old_definition, @my_word.reload.definition
@@ -100,7 +101,7 @@ class WordsControllerTest < ActionDispatch::IntegrationTest
   test 'delete word' do
     token = login_as_user
     assert_difference('Word.count', -1, 'Word should be deleted') do
-      delete '/words/' + @my_word.id.to_s, params: { auth_token: token }
+      delete '/words/' + @my_word.id.to_s, headers: { 'auth-token' => token }
     end
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal true, json_response['success'], json_response['error']
@@ -118,7 +119,7 @@ class WordsControllerTest < ActionDispatch::IntegrationTest
   test 'should not delete word when word belongs to other user collection' do
     token = login_as_user
     assert_difference('Word.count', 0, 'Word should not be deleted') do
-      delete '/words/' + @not_my_word.id.to_s, params: { auth_token: token }
+      delete '/words/' + @not_my_word.id.to_s, headers: { 'auth-token' => token }
     end
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal false, json_response['success'], json_response['error']
@@ -131,7 +132,7 @@ class WordsControllerTest < ActionDispatch::IntegrationTest
     new_definition = 'updated'
     new_translation = 'updated'
     patch '/words/1', params: { word: { definition: new_definition,
-                                        translation: new_translation }, auth_token: token }
+                                        translation: new_translation } }, headers: { 'auth-token' => token }
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal false, json_response['success'], json_response['error']
     assert_equal old_definition, @my_word.reload.definition
@@ -141,7 +142,7 @@ class WordsControllerTest < ActionDispatch::IntegrationTest
   test 'try delete word that not exist' do
     token = login_as_user
     assert_difference('Word.count', 0, 'Word should not be deleted') do
-      delete '/words/1', params: { auth_token: token }
+      delete '/words/1', headers: { auth_token: token }
     end
     json_response = ActiveSupport::JSON.decode @response.body
     assert_equal false, json_response['success'], json_response['error']

@@ -6,9 +6,11 @@ class UsersController < ApplicationController
     @user = User.new(user_create_params)
     if @user.save
       session[:user_id] = @user.id
-      render json: { success: true, data: { user: @user } }
+      render_response(true, nil,  @user)
+      # render json: { success: true, data: { user: @user } }
     else
-      render json: { success: false, error: @user.errors.full_messages.first }
+      # render json: { success: false, error: @user.errors.full_messages.first }
+      render_response(false, @user.errors.full_messages.first, nil)
      end
   end
 
@@ -27,9 +29,11 @@ class UsersController < ApplicationController
 
   def update_user(params)
     if current_user.update(params)
-      render json: { success: true, data: { user: current_user }, auth_token: updated_auth_token }
+      # render json: { success: true, data: { user: current_user }, auth_token: updated_auth_token }
+      render_response(true, nil, current_user)
     else
-      render json: { success: false, error: current_user.errors.full_messages.first, auth_token: updated_auth_token }
+      # render json: { success: false, error: current_user.errors.full_messages.first, auth_token: updated_auth_token }
+      render_response(false, current_user.errors.full_messages.first, nil)
     end
   end
 
