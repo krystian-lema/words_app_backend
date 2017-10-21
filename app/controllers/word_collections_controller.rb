@@ -1,4 +1,5 @@
 class WordCollectionsController < ApplicationController
+  protect_from_forgery with: :null_session
   before_action :authorize
   before_action :find_collection, only: %i[change_collection_name delete_collection]
   before_action :check_permission, only: %i[change_collection_name delete_collection]

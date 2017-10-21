@@ -1,4 +1,5 @@
 class WordsController < ApplicationController
+  protect_from_forgery with: :null_session
   before_action :authorize
   before_action :find_collection, only: %i[get_words_from_collection create_word]
   before_action :find_word, only: %i[edit_word delete_word]
